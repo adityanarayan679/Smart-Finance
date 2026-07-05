@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSmart Expense Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <aside class="sidebar glass">
+            <div class="logo">
+                <i class="fa-solid fa-wallet"></i>
+                <h2>FinSmart</h2>
+            </div>
+            <nav>
+                <a href="#" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#transactions"><i class="fa-solid fa-list-ul"></i> Transactions</a>
+                <a href="#receiptScanner"><i class="fa-solid fa-receipt"></i> Receipt Scanner</a>
+                <a href="#insights"><i class="fa-solid fa-lightbulb"></i> AI Insights</a>
+                <a href="#goals"><i class="fa-solid fa-bullseye"></i> Goals & Budget</a>
+            </nav>
+            <div class="theme-toggle">
+                <span><i class="fa-solid fa-moon"></i> Dark Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="themeSwitch" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="glass">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p id="currentDate">Welcome back! Here's your financial overview.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn primary" id="addExpenseBtn"><i class="fa-solid fa-plus"></i> Add Expense</button>
+                    <button class="btn secondary" id="ocrBtn"><i class="fa-solid fa-receipt"></i> Scan Receipt</button>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="kpi-card glass">
+                    <h3>Total Spent (This Month)</h3>
+                    <h2 id="monthlyTotal">₹0.00</h2>
+                    <p class="trend" id="monthlyTrend"><i class="fa-solid fa-minus"></i> 0% vs last month</p>
+                </div>
+                <div class="kpi-card glass">
+                    <h3>Remaining Budget</h3>
+                    <h2 id="remainingBudget">₹0.00</h2>
+                    <div class="progress-bar">
+                        <div class="progress" id="budgetProgress"></div>
+                    </div>
+                </div>
+                <div class="kpi-card glass">
+                    <h3>Next Month Forecast</h3>
+                    <h2 id="forecastTotal">₹0.00</h2>
+                    <p>Based on your daily average</p>
+                </div>
+                <div class="kpi-card glass">
+                    <h3>Health Score</h3>
+                    <h2 id="healthScore">0/100</h2>
+                    <p id="healthText">Evaluating...</p>
+                </div>
+            </section>
+
+            <section class="ai-command glass" id="insights">
+                <div class="section-heading">
+                    <div>
+                        <h3><i class="fa-solid fa-brain"></i> AI Forecast & Insights</h3>
+                        <p>Projected spending, budget risk, and pattern detection from your transaction history.</p>
+                    </div>
+                    <div class="confidence-pill" id="aiConfidence">Learning from expenses</div>
+                </div>
+                <div class="ai-grid">
+                    <div class="ai-hero">
+                        <span>Estimated Next Month</span>
+                        <strong id="aiNextMonth">₹0.00</strong>
+                        <p id="aiForecastRange">Range will appear after analysis.</p>
+                    </div>
+                    <div class="ai-metric">
+                        <span>Budget Risk</span>
+                        <strong id="aiBudgetRisk">Low</strong>
+                        <p id="aiBudgetAdvice">Spending is being evaluated.</p>
+                    </div>
+                    <div class="ai-metric">
+                        <span>Daily Safe Spend</span>
+                        <strong id="aiSafeSpend">₹0.00</strong>
+                        <p>Suggested pace for the rest of this month.</p>
+                    </div>
+                    <div class="ai-metric">
+                        <span>Unusual Spend</span>
+                        <strong id="aiAnomaly">None</strong>
+                        <p id="aiAnomalyText">No spikes detected yet.</p>
+                    </div>
+                </div>
+                <div class="ai-lower-grid">
+                    <div>
+                        <h4>Smart Insights</h4>
+                        <ul id="aiInsightsList" class="insights-list"></ul>
+                    </div>
+                    <div>
+                        <h4>Category Forecast</h4>
+                        <div id="categoryForecastList" class="forecast-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="charts-grid">
+                <div class="chart-container glass">
+                    <h3>Spending by Category</h3>
+                    <canvas id="donutChart"></canvas>
+                </div>
+                <div class="chart-container glass">
+                    <h3>Daily Trend</h3>
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </section>
+
+            <section class="scanner-section glass" id="receiptScanner">
+                <div class="section-heading">
+                    <div>
+                        <h3><i class="fa-solid fa-receipt"></i> Receipt Scanner</h3>
+                        <p>Upload a clear receipt photo to extract the merchant, date, total, and category.</p>
+                    </div>
+                    <button class="btn secondary" id="chooseReceiptBtn"><i class="fa-solid fa-upload"></i> Upload Receipt</button>
+                </div>
+                <input type="file" id="receiptInput" accept="image/*" hidden>
+                <div class="scanner-grid">
+                    <div class="receipt-preview">
+                        <img id="receiptPreview" alt="Receipt preview">
+                        <div id="receiptPlaceholder">
+                            <i class="fa-solid fa-file-image"></i>
+                            <span>No receipt selected</span>
+                        </div>
+                    </div>
+                    <div class="scanner-results">
+                        <div class="scan-status" id="scanStatus">Ready to scan</div>
+                        <div class="scan-progress"><div id="scanProgress"></div></div>
+                        <dl class="receipt-fields">
+                            <div><dt>Merchant</dt><dd id="scanMerchant">-</dd></div>
+                            <div><dt>Total</dt><dd id="scanTotal">-</dd></div>
+                            <div><dt>Date</dt><dd id="scanDate">-</dd></div>
+                            <div><dt>Category</dt><dd id="scanCategory">-</dd></div>
+                        </dl>
+                        <div class="scanner-actions">
+                            <button class="btn primary" id="useScanBtn" disabled><i class="fa-solid fa-pen-to-square"></i> Review Expense</button>
+                            <button class="btn secondary" id="clearScanBtn" disabled><i class="fa-solid fa-rotate-left"></i> Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="transactions-section glass" id="transactions">
+                <div class="section-heading compact">
+                    <h3>Recent Transactions</h3>
+                    <button class="btn secondary" id="clearDemoBtn"><i class="fa-solid fa-broom"></i> Reset Demo Data</button>
+                </div>
+                <div class="table-container">
+                    <table id="transactionsTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="expenseModal" class="modal" aria-hidden="true">
+        <div class="modal-content glass">
+            <button class="close" type="button" aria-label="Close">&times;</button>
+            <h2 id="modalTitle">Add New Expense</h2>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label for="expAmount">Amount (₹)</label>
+                    <input type="number" id="expAmount" required step="0.01" min="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="expDesc">Description</label>
+                    <input type="text" id="expDesc" required>
+                </div>
+                <div class="form-group">
+                    <label for="expCategory">Category</label>
+                    <select id="expCategory" required>
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Bills">Bills</option>
+                        <option value="Education">Education</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="expDate">Date</label>
+                    <input type="date" id="expDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="expMethod">Payment Method</label>
+                    <select id="expMethod">
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="UPI">UPI</option>
+                        <option value="Cash">Cash</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn primary full-width">Save Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
