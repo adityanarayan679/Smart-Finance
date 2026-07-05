@@ -159,7 +159,10 @@
             <section class="transactions-section glass" id="transactions">
                 <div class="section-heading compact">
                     <h3>Recent Transactions</h3>
-                    <button class="btn secondary" id="clearDemoBtn"><i class="fa-solid fa-broom"></i> Reset Demo Data</button>
+                    <div class="table-actions">
+                        <button class="btn secondary" id="emptyDataBtn"><i class="fa-solid fa-eraser"></i> Start Fresh</button>
+                        <button class="btn secondary" id="clearDemoBtn"><i class="fa-solid fa-broom"></i> Load Demo Data</button>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table id="transactionsTable">

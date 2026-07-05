@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+    const savedExpenses = localStorage.getItem('expenses');
+    const shouldStartFresh = localStorage.getItem('startFresh') === 'true';
+    let expenses = savedExpenses ? JSON.parse(savedExpenses) : [];
     let scannedReceipt = null;
     const monthlyBudget = 50000;
     const categories = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Education', 'Healthcare', 'Miscellaneous'];
 
-    if (expenses.length === 0) {
+    if (expenses.length === 0 && !shouldStartFresh) {
         expenses = generateSeedData();
         saveExpenses();
     }
@@ -19,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const receiptPlaceholder = document.getElementById('receiptPlaceholder');
     const useScanBtn = document.getElementById('useScanBtn');
     const clearScanBtn = document.getElementById('clearScanBtn');
+    const emptyDataBtn = document.getElementById('emptyDataBtn');
     const clearDemoBtn = document.getElementById('clearDemoBtn');
     const closeBtn = document.querySelector('.close');
     const form = document.getElementById('expenseForm');
@@ -49,8 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
     chooseReceiptBtn.addEventListener('click', () => receiptInput.click());
     closeBtn.addEventListener('click', closeExpenseModal);
     clearScanBtn.addEventListener('click', resetScanner);
+    emptyDataBtn.addEventListener('click', () => {
+        expenses = [];
+        localStorage.setItem('startFresh', 'true');
+        saveExpenses();
+        updateDashboard();
+    });
     clearDemoBtn.addEventListener('click', () => {
         expenses = generateSeedData();
+        localStorage.setItem('startFresh', 'false');
         saveExpenses();
         updateDashboard();
     });

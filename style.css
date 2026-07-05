@@ -333,6 +333,7 @@ header p { color: var(--text-muted); margin-top: 5px; }
 
 /* Table */
 .transactions-section { padding: 20px; }
+.table-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
 .table-container { overflow-x: auto; margin-top: 15px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border); }
@@ -370,6 +371,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     .header-actions, .header-actions .btn { width: 100%; }
     .section-heading { flex-direction: column; }
     .section-heading .btn { width: 100%; }
+    .table-actions { width: 100%; }
     .confidence-pill { align-self: flex-start; }
     .ai-grid, .ai-lower-grid { grid-template-columns: 1fr; }
     .ai-hero strong { font-size: 1.65rem; }
